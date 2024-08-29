@@ -1,0 +1,34 @@
+Here's a breakdown of **Multiprocessing**, **Multiprogramming**, and **Multitasking**, along with examples for clarity:
+
+### 1. **Multiprocessing:**
+**Definition:** Multiprocessing refers to a system’s ability to support more than one processor (CPU), allowing multiple processes to run simultaneously. Each CPU works on a different task at the same time, improving the system’s performance and throughput. Multiprocessing can either be **Symmetric** (where all processors share the same memory and I/O resources) or **Asymmetric** (where one processor controls the system and the others perform tasks).
+
+- **Example:** A computer with a quad-core processor (four CPUs) can run multiple processes in parallel, such as processing a large dataset while also running background tasks like virus scanning and media playback. Each core handles a separate task.
+  
+  - **Real-World Example:** A web server with multiple processors handling different client requests simultaneously, allowing faster processing of user requests.
+
+### 2. **Multiprogramming:**
+**Definition:** Multiprogramming is the technique of executing multiple programs on a single processor by interleaving the execution of their processes. The CPU switches between programs when one is waiting for I/O operations to complete. Although the programs do not run at the same time, it creates the illusion of concurrent execution by efficiently utilizing CPU time.
+
+- **Example:** In a single-CPU system, you might have multiple programs like a text editor, a web browser, and a media player open. The OS will switch between them, processing one task while another is waiting for I/O, such as reading from the disk or user input.
+
+  - **Real-World Example:** A banking system where one program handles user transactions while another program handles account balance inquiries, switching between them when one is idle due to I/O wait times.
+
+### 3. **Multitasking:**
+**Definition:** Multitasking is the capability of an operating system to execute multiple tasks (processes) simultaneously by quickly switching between them. There are two types of multitasking:
+   - **Preemptive Multitasking:** The OS allocates a certain amount of CPU time to each process and switches tasks before it is completed.
+   - **Cooperative Multitasking:** Processes voluntarily yield control periodically or when idle, allowing the OS to switch to another task.
+
+- **Example:** On your personal computer, you might be using a web browser while listening to music and downloading a file simultaneously. The OS quickly switches between these tasks, giving the impression that they are happening at the same time.
+
+  - **Real-World Example:** An operating system like Windows or Linux allows users to run a spreadsheet application while also browsing the internet and streaming music. The OS switches between these tasks so fast that the user perceives all tasks as running simultaneously.
+
+### **Comparison:**
+- **Multiprocessing:** Focuses on multiple processors executing processes in parallel. 
+  - **Example:** Multiple cores processing different parts of a complex program simultaneously.
+  
+- **Multiprogramming:** Focuses on maximizing CPU utilization by allowing multiple programs to reside in memory and switch execution when waiting for I/O.
+  - **Example:** A computer running a text editor, compiler, and file manager where one waits for input while the other uses the CPU.
+  
+- **Multitasking:** Allows multiple tasks to run simultaneously by switching between them rapidly, either on a single CPU or multiple CPUs.
+  - **Example:** Running a video call and document editing simultaneously on a laptop.
