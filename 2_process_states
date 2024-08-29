@@ -1,0 +1,98 @@
+ ### **Process States in an Operating System:**
+
+A process in an operating system can be in one of several states during its lifecycle. These states represent the current status of the process and determine how the process interacts with system resources like the CPU and memory.
+
+### **1. New:** 
+The process is just being created and hasn’t started execution yet.
+
+- **Example:** When a user launches a program, a process is created but hasn’t started executing yet.
+
+---
+
+### **2. Ready:**
+The process is loaded into memory and is waiting to be assigned to a CPU for execution. It is ready to run but not currently running.
+
+- **Ready Queue:** This is a queue where all processes that are ready and waiting for CPU time are kept. The CPU scheduler picks processes from this queue for execution.
+  
+- **Example:** Several programs are running on your computer, but only one can use the CPU at a time. The others are in the ready queue, waiting their turn.
+
+---
+
+### **3. Running:**
+The process is currently being executed on the CPU. Only one process can be in the running state on a single CPU at any time.
+
+- **Example:** A word processor that you are actively typing into is in the running state, using the CPU.
+
+---
+
+### **4. Blocked (or Waiting):**
+The process is unable to proceed until some external event (like an I/O operation) is completed. While in this state, the process doesn't require CPU time but waits for the event to complete.
+
+- **Example:** A process is waiting for input from a user (keyboard or mouse), or for data to be read from a disk. While waiting, the process enters the blocked state.
+
+---
+
+### **5. Terminated (or Exit):**
+The process has finished execution and is waiting to be removed from the process table.
+
+- **Example:** After a program completes its task, such as a video converter finishing converting a file, it enters the terminated state.
+
+---
+
+### **6. Suspended:**
+The process is temporarily moved out of memory and into secondary storage (e.g., hard drive) to free up memory for other processes. A suspended process can be either **suspended-ready** (waiting to be moved back into memory and run) or **suspended-blocked** (waiting for an I/O operation or other event before it can be resumed).
+
+- **Example:** A background process that hasn’t been active for a while might be suspended by the OS to free up memory for more active processes.
+
+---
+
+### **Process Scheduling Queues:**
+
+1. **Long-Term Scheduler (LTS) or Job Scheduler:**
+   - **Function:** Decides which processes should be brought into the ready queue from the new state. It controls the degree of multiprogramming.
+   - **Example:** When you start multiple programs at once, the LTS decides which ones to load into memory and add to the ready queue for execution.
+
+2. **Short-Term Scheduler (STS) or CPU Scheduler:**
+   - **Function:** Decides which process from the ready queue should be executed next on the CPU. It frequently switches processes based on scheduling algorithms.
+   - **Example:** If you have a web browser and a music player open, the STS decides which process gets CPU time for a few milliseconds before switching to another.
+
+3. **Medium-Term Scheduler (MTS):**
+   - **Function:** Moves processes from memory to storage (i.e., suspends them) when memory is low or when the system is overloaded, and later resumes them when resources are available.
+   - **Example:** If you minimize a browser window for a long period, the MTS may suspend that process, moving it from memory to disk.
+
+---
+
+### **How Process States Work Together:**
+
+1. **New → Ready:** 
+   - When a new process is created, it enters the ready queue, waiting for CPU time.
+
+2. **Ready → Running:** 
+   - The CPU scheduler selects a process from the ready queue and allocates CPU time, transitioning the process into the running state.
+
+3. **Running → Blocked (Waiting):** 
+   - If a process requires I/O (e.g., waiting for a file to be read), it moves to the blocked state and waits for the I/O operation to complete.
+
+4. **Blocked → Ready:** 
+   - Once the I/O operation is completed, the process moves back to the ready state, waiting for CPU time again.
+
+5. **Running → Ready:** 
+   - If a process’s time slice is over (in preemptive scheduling), the process is moved back to the ready state to allow other processes to run.
+
+6. **Running → Terminated:** 
+   - Once the process completes its execution, it is terminated and removed from the process queue.
+
+7. **Running → Suspended:** 
+   - If the system is low on memory or resources, a process can be suspended, moving it from memory to secondary storage until it's ready to run again.
+
+---
+
+### **Example of Process Life Cycle:**
+1. **Starting a Web Browser:**
+   - **New:** A new process is created when the user clicks to open the browser.
+   - **Ready:** The browser is loaded into memory, waiting for CPU allocation.
+   - **Running:** The CPU scheduler picks the browser process, and it starts loading web pages.
+   - **Blocked:** While waiting for the internet connection to retrieve web data, the process enters the blocked state.
+   - **Ready:** Once the data is received, the process moves back to the ready queue.
+   - **Running:** The browser continues to render the webpage and display it to the user.
+   - **Terminated:** When the user closes the browser, the process completes and is terminated.

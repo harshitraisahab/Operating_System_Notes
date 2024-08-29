@@ -1,0 +1,107 @@
+### **System Calls:**
+A **system call** is a way for programs (user-space processes) to interact with the operating system's kernel. Since direct access to hardware and critical system resources is restricted for security and stability, system calls provide a controlled way for programs to request services, such as file manipulation, memory allocation, and process management, from the kernel.
+
+- **Example:** When you open a file, your program requests the kernel to open it by issuing a system call (e.g., `open()` in Linux or Windows).
+  
+System calls act as an interface between a process and the operating system, allowing user programs to:
+1. **Create processes** (`fork()`)
+2. **Read/write files** (`read()`, `write()`)
+3. **Request memory** (`malloc()`)
+4. **Communicate with devices** (networking or I/O calls like `send()` or `recv()`)
+
+---
+
+### **User Mode vs. Kernel Mode:**
+
+In an operating system, there are two main execution modes:
+1. **User Mode:**
+   - In this mode, applications (user-space processes) run with restricted privileges, meaning they can't directly access system resources like hardware or memory management. This helps protect the system from accidental or malicious actions.
+   - When a program makes a system call, the processor switches from user mode to kernel mode.
+
+2. **Kernel Mode:**
+   - The kernel operates with full privileges and can directly access all hardware and system resources. The kernel handles all critical tasks like managing processes, memory, and devices.
+   - When a system call is made, the process enters **kernel mode**. After the system call is executed, the process switches back to **user mode**.
+
+- **Switching Between Modes:**
+   - The transition from user mode to kernel mode happens when a process invokes a system call. The OS traps (interrupts) the program, validates the request, performs the necessary actions in kernel mode, and then switches back to user mode once the system call completes.
+   - This **context switch** ensures that the kernel can safely manage system resources on behalf of the process.
+
+---
+
+### **What is `fork()` System Call?**
+
+The **`fork()` system call** is used in Unix-based systems (like Linux) to create a new process. When a process calls `fork()`, the operating system creates a **child process**, which is a copy of the parent process. The child process inherits most of the parent's attributes (like environment, file descriptors, and memory), but it runs as a separate process with a unique process ID (PID).
+
+- **How `fork()` works:**
+   1. The parent process calls `fork()`.
+   2. The operating system creates a child process that is an almost identical copy of the parent process.
+   3. The child and parent processes continue executing the same code, but `fork()` returns a different value:
+      - To the **parent process**, `fork()` returns the child’s process ID (a positive value).
+      - To the **child process**, `fork()` returns `0`.
+   4. The parent and child processes can now execute independently.
+
+- **Example:**
+   ```c
+   #include <stdio.h>
+   #include <unistd.h>
+   
+   int main() {
+       int pid = fork();
+       
+       if (pid == 0) {
+           // Child process
+           printf("This is the child process.\n");
+       } else {
+           // Parent process
+           printf("This is the parent process. Child PID: %d\n", pid);
+       }
+       
+       return 0;
+   }
+   ```
+   - **Output:** You will see both statements printed, one by the parent and one by the child, as two processes are now running independently.
+   
+- **Parent-Child Difference:**
+  - The **parent process** will know the PID of the child because `fork()` returns this value to the parent.
+  - The **child process** knows it’s the child because `fork()` returns 0 to the child.
+
+---
+
+### **Difference Between `fork()` and Other System Calls:**
+
+1. **`fork()` vs Regular System Calls:**
+   - **`fork()`** is a unique system call because it creates an entirely new process. In contrast, most system calls (like `open()`, `read()`, `write()`, etc.) perform tasks **within the same process** (e.g., opening a file or reading data).
+   - **Example:**
+     - `fork()`: Creates a new process.
+     - `open()`: Opens a file within the same process.
+
+2. **`fork()` vs `exec()` System Call:**
+   - After `fork()`, both parent and child are running the same code. However, if you want the child to run a **different program**, you can use the **`exec()`** system call. `exec()` replaces the current process image with a new one (i.e., runs a new program within the child process).
+   - **Example:**
+     ```c
+     if (fork() == 0) {
+         // Child process runs a different program
+         execv("/bin/ls", NULL);
+     }
+     ```
+     - In this example, after `fork()`, the child process calls `exec()` to replace its code with the `/bin/ls` command.
+
+3. **`fork()` vs `vfork()`:**
+   - **`vfork()`** is a variant of `fork()`, used when the child process does not require a copy of the parent's memory. In `vfork()`, the child and parent share the same address space until the child process calls `exec()` or exits, making it more efficient in some cases.
+   - **Difference:** `vfork()` is faster because it doesn’t copy the parent’s memory space, but it is more dangerous since both processes share the same memory.
+
+---
+
+### **Example of `fork()` in Real-Life:**
+- **Process Creation in Operating Systems:**
+   When you open a terminal in Linux and run a command like `ls`, the shell process uses `fork()` to create a new process. The shell (parent process) calls `fork()`, and the child process executes the `ls` command. Once the command completes, the child process exits, and control returns to the shell.
+
+### **Summary:**
+- **System Call:** Provides an interface for user applications to request services from the kernel.
+- **Kernel Mode:** Where the operating system has full control over the system, allowing direct access to hardware and system resources.
+- **`fork()` System Call:** Creates a new process (child) that is a copy of the parent process.
+- **Differences:**
+  - `fork()` creates a new process, while other system calls perform actions within the same process.
+  - `exec()` can be used after `fork()` to replace the child’s process image with a new program.
+
+These concepts form the core of process management in Unix-based operating systems, and understanding them is crucial for system-level programming and OS functionality.

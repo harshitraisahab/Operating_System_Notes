@@ -1,0 +1,155 @@
+### **Difference Between Processes and Threads:**
+
+#### **1. Processes:**
+- A **process** is an independent program in execution. It contains its own **memory space**, data, and resources, and it operates in isolation from other processes. Processes are the fundamental unit of execution in an operating system.
+  
+- **Key Characteristics:**
+  1. **Memory Isolation:** Each process has its own memory space (address space), meaning the memory used by one process cannot be accessed by another process.
+  2. **Heavyweight:** Processes are relatively heavyweight because they require more system resources (e.g., memory, CPU) to create and manage.
+  3. **Inter-Process Communication (IPC):** Communication between processes is complex and requires mechanisms like pipes, sockets, or shared memory.
+  4. **Context Switching:** Switching between processes (context switching) is slower because it involves saving and restoring the entire process state, including memory, CPU registers, etc.
+
+- **Example:**
+  - When you open a **web browser** and a **text editor** simultaneously, they run as two separate processes. Each has its own memory space, and an issue in one process (like the browser crashing) won't affect the other (the text editor).
+
+---
+
+#### **2. Threads:**
+- A **thread** is a smaller unit of a process, also known as a **lightweight process**. A single process can contain multiple threads that share the same memory and resources, but each thread runs independently and concurrently.
+  
+- **Key Characteristics:**
+  1. **Shared Memory:** Threads within the same process share the same memory space, meaning they can directly access and modify each other’s data.
+  2. **Lightweight:** Threads are lightweight because they don’t require separate memory space. Creating and switching between threads is faster and consumes fewer resources.
+  3. **Communication:** Threads can easily communicate with each other since they share the same memory.
+  4. **Context Switching:** Switching between threads is faster than switching between processes because threads share the process state.
+
+- **Example:**
+  - In a web browser, **multiple tabs** may run as threads within the same process. All threads share resources like the browser's cache and memory, but each thread can load a different web page independently.
+
+---
+
+### **Key Differences Between Processes and Threads:**
+
+| Aspect                 | **Processes**                                        | **Threads**                                          |
+|------------------------|-----------------------------------------------------|-----------------------------------------------------|
+| **Definition**          | An independent program with its own memory and resources. | A smaller unit of a process; multiple threads share the same resources. |
+| **Memory**              | Each process has its own memory space (isolated).   | Threads share the same memory and address space.    |
+| **Creation Overhead**   | Creating a process is expensive and slow.           | Creating a thread is lightweight and faster.        |
+| **Communication**       | Inter-process communication is complex.             | Threads communicate easily by accessing shared memory. |
+| **Context Switching**   | Slow because it involves saving/restoring the process state. | Fast since threads share the same process state.    |
+| **Example**             | Running multiple applications (browser, text editor, etc.) | A web browser with multiple tabs or a server handling multiple clients. |
+
+---
+
+### **Functions of Processes:**
+
+1. **Process Creation and Termination:**
+   - **`fork()`** and **`exec()`** system calls create new processes.
+   - **`exit()`** terminates a process.
+
+   **Example:**
+   ```c
+   int pid = fork(); // Creates a new process
+   if (pid == 0) {
+       execv("/bin/ls", NULL); // Child process runs ls command
+   }
+   ```
+
+2. **Process Scheduling:**
+   - The OS schedules processes based on priority or other scheduling algorithms like Round-Robin, Priority Scheduling, etc.
+   
+3. **Memory Management:**
+   - The OS allocates and deallocates memory to processes. Each process has its own **virtual memory** space.
+
+---
+
+### **Functions of Threads:**
+
+1. **Parallel Execution:**
+   - Threads allow parallel execution of tasks within a process, enabling better CPU utilization, especially for multi-core systems.
+   
+   **Example in Python:**
+   ```python
+   import threading
+
+   def task():
+       print("Task running")
+
+   # Create two threads
+   thread1 = threading.Thread(target=task)
+   thread2 = threading.Thread(target=task)
+
+   # Start threads
+   thread1.start()
+   thread2.start()
+   ```
+
+2. **Shared Memory Access:**
+   - Threads within the same process can access and modify shared data. However, **synchronization mechanisms** (e.g., locks) are needed to prevent **race conditions**.
+
+3. **Multithreading:**
+   - Multithreading allows a process to handle multiple tasks simultaneously.
+   
+   **Example:** A server handling multiple client requests simultaneously, where each request is handled by a different thread.
+
+---
+
+### **Example:**
+#### **Processes Example in Python:**
+
+```python
+import os
+
+def child_process():
+    print(f"Child process {os.getpid()} running")
+
+if __name__ == "__main__":
+    pid = os.fork()
+    
+    if pid == 0:
+        # Child process
+        child_process()
+    else:
+        # Parent process
+        print(f"Parent process {os.getpid()} created child process {pid}")
+```
+
+- **Explanation:**
+  - `os.fork()` creates a new process (child), and both parent and child execute independently. The parent prints the child’s PID, while the child prints its own.
+
+#### **Threads Example in Python:**
+
+```python
+import threading
+
+def print_numbers():
+    for i in range(5):
+        print(f"Thread {threading.current_thread().name}: {i}")
+
+if __name__ == "__main__":
+    thread1 = threading.Thread(target=print_numbers, name="Thread1")
+    thread2 = threading.Thread(target=print_numbers, name="Thread2")
+    
+    thread1.start()
+    thread2.start()
+    
+    thread1.join()
+    thread2.join()
+```
+
+- **Explanation:**
+  - Two threads are created and executed concurrently, each printing numbers. Since threads share memory, they can easily communicate, but care must be taken to prevent race conditions when accessing shared resources.
+
+---
+
+### **When to Use Processes vs. Threads:**
+
+1. **Processes:**
+   - **Use Case:** When you need strong **isolation** between different parts of your application or if you are performing **heavyweight tasks** that require separate memory spaces.
+   - **Example:** Running independent applications like a video player and a word processor.
+
+2. **Threads:**
+   - **Use Case:** When you need to perform **lightweight** parallel tasks that can share data and resources. Threads are ideal for **parallelism** on multi-core systems.
+   - **Example:** A web server handling multiple requests at the same time.
+
+In summary, **processes** are used for isolating applications and ensuring robustness, while **threads** allow parallel execution within the same process, enabling more efficient use of CPU resources.
