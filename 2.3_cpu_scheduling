@@ -1,0 +1,56 @@
+In an Operating System (OS), scheduling algorithms determine how processes are assigned to the CPU to be executed. CPU scheduling is essential to manage multiple processes efficiently, ensuring that system resources are used optimally, and tasks are executed in a timely manner.
+
+Here are the key CPU scheduling algorithms used in OS:
+
+1. First-Come, First-Served (FCFS) Scheduling
+Description: Processes are scheduled in the order they arrive in the ready queue. The process that arrives first is executed first.
+Type: Non-preemptive.
+Example:
+Processes: P1 (Arrival Time = 0, Burst Time = 4), P2 (Arrival Time = 1, Burst Time = 3), P3 (Arrival Time = 2, Burst Time = 5).
+Execution Order: P1 → P2 → P3.
+Gantt Chart: | P1 | P2 | P3 |
+Disadvantage: Convoy effect—short processes may get stuck waiting for long processes.
+
+
+
+2. Shortest Job Next (SJN) / Shortest Job First (SJF)
+Description: The process with the smallest burst time is executed first.
+Type: Non-preemptive or Preemptive (Shortest Remaining Time First).
+Example:
+Processes: P1 (Arrival Time = 0, Burst Time = 6), P2 (Arrival Time = 1, Burst Time = 8), P3 (Arrival Time = 2, Burst Time = 7), P4 (Arrival Time = 3, Burst Time = 3).
+Execution Order: P4 → P1 → P3 → P2.
+Gantt Chart: | P4 | P1 | P3 | P2 |
+Advantage: Minimizes the average waiting time.
+Disadvantage: Can cause starvation if short jobs keep coming.
+
+
+
+3. Round Robin (RR) Scheduling
+Description: Each process is assigned a fixed time slice (quantum), and the CPU cycles through the processes in a circular manner.
+Type: Preemptive.
+Example:
+Processes: P1 (Burst Time = 4), P2 (Burst Time = 5), P3 (Burst Time = 6), Quantum = 2.
+Execution Order: P1 (2) → P2 (2) → P3 (2) → P1 (2) → P2 (3) → P3 (4).
+Gantt Chart: | P1 | P2 | P3 | P1 | P2 | P3 |
+Advantage: Fair for all processes, and ideal for time-sharing systems.
+Disadvantage: High overhead due to frequent context switching.
+
+
+4. Priority Scheduling
+Description: Each process is assigned a priority, and the process with the highest priority is executed first. If two processes have the same priority, FCFS is used.
+Type: Preemptive or Non-preemptive.
+Example:
+Processes: P1 (Priority = 2, Burst Time = 4), P2 (Priority = 1, Burst Time = 3), P3 (Priority = 3, Burst Time = 2).
+Execution Order: P2 → P1 → P3.
+Gantt Chart: | P2 | P1 | P3 |
+Disadvantage: Can cause starvation—low-priority processes may never get executed.
+
+
+5. Shortest Remaining Time First (SRTF)
+Description: A preemptive version of SJF. The process with the least remaining burst time is executed next. If a new process arrives with a smaller burst time than the current process, the CPU switches to the new process.
+Type: Preemptive.
+Example:
+Processes: P1 (Burst Time = 7), P2 (Burst Time = 4), P3 (Burst Time = 2), P4 (Burst Time = 1).
+Execution Order: P4 → P3 → P2 → P1.
+Gantt Chart: | P4 | P3 | P2 | P1 |
+Advantage: Further reduces waiting time compared to SJF.

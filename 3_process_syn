@@ -1,0 +1,126 @@
+### **Process Synchronization**
+
+**Process synchronization** in an operating system ensures that multiple processes or threads execute concurrently without interfering with each other, especially when accessing shared resources. It helps avoid **race conditions**, where two or more processes read and write shared data at the same time, leading to inconsistencies.
+
+### **Critical Section**
+
+A **critical section** is a part of a program where shared resources, like data or files, are accessed or modified. Only one process should execute in its critical section at a time to avoid data corruption or inconsistency.
+
+#### **Real-Life Example of Critical Section**:
+
+- Imagine a bank system where two employees access and update the balance of the same account. If both update it at the same time without coordination, it can lead to incorrect account balances due to overlapping access. Therefore, they need a mechanism to ensure that only one employee can update the account at a time, protecting the critical section.
+
+### **Synchronization Mechanisms**
+
+Synchronization mechanisms are used to coordinate processes, ensuring that the critical section is accessed by only one process at a time.
+
+#### Common synchronization mechanisms:
+
+1. **Locks (or Mutexes)**
+2. **Semaphores**
+3. **Monitors**
+4. **Spinlocks**
+5. **Barriers**
+
+### **Lock Variable**
+
+A **lock variable** is used to indicate if the critical section is being used or not. The variable can be 0 or 1 (binary value):
+
+- **1 (locked)**: Critical section is being used.
+- **0 (unlocked)**: Critical section is available.
+
+#### Example:
+
+- Before entering the critical section, a process checks the lock. If the lock is set to 0, it sets it to 1 and enters the critical section. After finishing, it resets the lock to 0.
+- **Drawback**: This approach can lead to race conditions if two processes simultaneously check the lock.
+
+### **Test-and-Set Instruction**
+
+The **test-and-set** is a hardware-supported atomic instruction that checks and sets a lock in one step, avoiding race conditions. It checks the current value of the lock and, if it’s 0, sets it to 1, ensuring that only one process can acquire the lock at a time.
+
+#### Example:
+
+1. **test_and_set(lock)**:
+   - If `lock = 0`, set `lock = 1` and return 0 (critical section can be entered).
+   - If `lock = 1`, return 1 (critical section is already in use).
+
+#### Code Example:
+
+```c
+bool test_and_set(bool *lock) {
+    bool old_value = *lock;
+    *lock = true;
+    return old_value;
+}
+```
+
+### **Semaphore**
+
+A **semaphore** is a synchronization mechanism that uses a counter to control access to a shared resource. Unlike a simple lock, semaphores can allow multiple processes to access the resource concurrently based on its counter value.
+
+#### Types of Semaphores:
+
+1. **Binary Semaphore**:
+
+   - Works like a lock; only allows one process into the critical section.
+   - Value: 0 or 1.
+   - **Example**: Controlling access to a printer, where only one process should print at a time.
+
+2. **Counting Semaphore**:
+   - Allows a certain number of processes into the critical section.
+   - Value: An integer representing how many resources are available.
+   - **Example**: Suppose a parking lot has 5 spaces. A counting semaphore with an initial value of 5 will decrement as cars park and increment as they leave, ensuring no more than 5 cars park at a time.
+
+#### Semaphore Operations:
+
+- **wait(P)**: Decrements the semaphore by 1 if its value is greater than 0. If the value is 0, the process is blocked until the value is incremented by another process.
+- **signal(V)**: Increments the semaphore by 1 and wakes up a waiting process, if any.
+
+#### Example:
+
+```c
+semaphore S = 1; // Binary Semaphore (Initial value is 1)
+
+void wait(semaphore *S) {
+    while (*S <= 0); // Busy-wait (optional in some implementations)
+    (*S)--;
+}
+
+void signal(semaphore *S) {
+    (*S)++;
+}
+```
+
+#### Real-Life Example of Semaphore:
+
+- **Traffic Lights**: A traffic signal system acts like a semaphore to control the flow of cars at an intersection. Only a certain number of cars (or one at a time in some cases) can pass through the intersection, while others must wait.
+
+### **Example of Synchronization Mechanisms**
+
+#### **Lock Mechanism Example**:
+
+Two processes, P1 and P2, want to update a shared variable:
+
+1. **Without Lock**: Both can update simultaneously, leading to race conditions.
+2. **With Lock**: Only one process can access the variable at a time, ensuring consistency.
+
+#### **Semaphore Example**:
+
+In a **shared printer** scenario:
+
+- Only one process can print at a time. A binary semaphore can be used to manage access to the printer:
+  - When a process wants to print, it performs a `wait()` on the semaphore. If it's available (value 1), the process can print; otherwise, it waits.
+  - After printing, the process calls `signal()` to release the printer.
+
+### **Summary of Key Concepts**:
+
+| Mechanism              | Description                                                                 | Example                                                      |
+| ---------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **Critical Section**   | Part of the code accessing shared resources.                                | Bank account balance update.                                 |
+| **Lock Variable**      | A simple variable indicating if a process is in the critical section.       | Lock set to 1 when a process is using the shared resource.   |
+| **Test-and-Set**       | Atomic hardware instruction to check and set a lock.                        | Ensures mutual exclusion in critical sections.               |
+| **Binary Semaphore**   | A semaphore with a value of 0 or 1.                                         | Printer access control.                                      |
+| **Counting Semaphore** | A semaphore with a counter, allowing multiple resources to be used.         | Parking lot management, limiting spaces for incoming cars.   |
+| **Wait and Signal**    | Semaphore operations for decrementing and incrementing the semaphore value. | `wait()` to enter the critical section, `signal()` to leave. |
+
+These mechanisms ensure processes cooperate properly when sharing resources, preventing data corruption and ensuring smooth operation in concurrent systems.

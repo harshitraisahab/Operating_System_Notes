@@ -1,0 +1,128 @@
+### **Deadlock**
+A **deadlock** occurs in a system when a set of processes are blocked because each process is waiting for a resource that another process holds, creating a cycle of dependencies. As a result, none of the processes can continue execution.
+
+### **Example of Deadlock**:
+- **Process P1** holds Resource A and is waiting for Resource B.
+- **Process P2** holds Resource B and is waiting for Resource A.
+- Since both processes are waiting for each other to release the resources, neither can proceed, leading to a deadlock.
+
+### **Conditions for Deadlock (Coffman Conditions)**
+Deadlock occurs if all the following four conditions hold simultaneously:
+
+1. **Mutual Exclusion**:
+   - A resource is non-shareable, meaning only one process can use it at a time.
+   - Example: A printer can only print for one process at a time.
+
+2. **Hold and Wait**:
+   - A process holding at least one resource is waiting for additional resources that are held by other processes.
+   - Example: Process P1 holds Resource A and waits for Resource B.
+
+3. **No Preemption**:
+   - A resource cannot be forcibly taken away from a process holding it. The process must release the resource voluntarily.
+   - Example: A process using the CPU cannot be interrupted until it completes its execution.
+
+4. **Circular Wait**:
+   - A circular chain of processes exists where each process is waiting for a resource held by the next process in the chain.
+   - Example: P1 waits for a resource held by P2, P2 waits for a resource held by P3, and P3 waits for a resource held by P1.
+
+### **Resource Allocation Graph (RAG)**
+A **Resource Allocation Graph** (RAG) is a graphical representation of the resources allocated to processes and the requests made by processes for resources. It consists of:
+
+- **Processes (P1, P2, P3, etc.)**: Represented as circles.
+- **Resources (R1, R2, R3, etc.)**: Represented as squares.
+- **Edges**:
+  - **Request Edge** (Process → Resource): A directed edge from a process to a resource indicates that the process is requesting that resource.
+  - **Assignment Edge** (Resource → Process): A directed edge from a resource to a process indicates that the resource is assigned to that process.
+
+#### **Example**:
+- **P1 → R1**: Process P1 is requesting Resource R1.
+- **R1 → P2**: Resource R1 is allocated to Process P2.
+
+In a **deadlock situation**, a cycle would exist in the RAG, showing circular dependencies between processes and resources.
+
+### **Deadlock Handling Methods**
+There are four main strategies for handling deadlocks:
+
+1. **Deadlock Prevention**
+   - Modify the system design to ensure that at least one of the four conditions for deadlock never occurs.
+   - Examples:
+     - **Mutual Exclusion**: Share resources wherever possible.
+     - **Hold and Wait**: Require processes to request all resources at once.
+     - **No Preemption**: Allow resources to be preempted (forcefully taken).
+     - **Circular Wait**: Impose a total ordering of resource acquisition (processes must request resources in a specific sequence).
+
+2. **Deadlock Avoidance**
+   - Ensure the system never enters an unsafe state, where deadlock could occur, by dynamically checking resource allocation.
+   - Uses algorithms like the **Banker’s Algorithm** (explained below).
+   - In avoidance, processes declare in advance the maximum resources they will need.
+
+3. **Deadlock Detection and Recovery**
+   - **Detection**: The system allows deadlocks to occur but has mechanisms to detect when a deadlock happens.
+   - **Recovery**: Once a deadlock is detected, the system takes action, such as:
+     - Terminating one or more processes involved in the deadlock.
+     - Preempting resources held by deadlocked processes.
+   - **Example**: Killing a process to free up a resource and break the deadlock cycle.
+
+4. **Deadlock Ignorance**
+   - The system does nothing to prevent or avoid deadlocks, assuming they are rare.
+   - **Example**: Many operating systems like Linux use this approach and rely on system administrators to handle deadlocks if they occur.
+
+---
+
+### **Banker’s Algorithm**
+The **Banker’s Algorithm** is a deadlock avoidance algorithm that ensures the system only allocates resources to processes if it leads to a **safe state** (a state where deadlock is not possible).
+
+#### **Key Concepts**:
+- **Safe State**: A state where the system can allocate resources to every process in some order without causing a deadlock.
+- **Unsafe State**: A state where the system may enter a deadlock, depending on the resource requests of processes.
+
+#### **Data Structures**:
+1. **Available**: Number of available resources of each type.
+2. **Maximum**: Maximum number of resources that each process may need.
+3. **Allocation**: Number of resources of each type currently allocated to each process.
+4. **Need**: Resources still required by each process to complete, calculated as `Need[i] = Maximum[i] - Allocation[i]`.
+
+#### **Banker’s Algorithm Steps**:
+1. **Check if the request is less than or equal to the available resources**.
+   - If true, pretend to allocate the requested resources to the process and see if it leads to a safe state.
+   - If the system remains in a safe state, allocate the resources; otherwise, make the process wait.
+
+#### **Example of Banker’s Algorithm**:
+Assume a system with:
+- 3 resource types: A, B, C.
+- Available resources: `A = 3`, `B = 3`, `C = 2`.
+
+Three processes have the following **Maximum**, **Allocation**, and **Need** matrices:
+
+| Process | Maximum (A,B,C) | Allocation (A,B,C) | Need (A,B,C) |
+|---------|-----------------|--------------------|--------------|
+| P1      | 7, 5, 3         | 0, 1, 0            | 7, 4, 3      |
+| P2      | 3, 2, 2         | 2, 0, 0            | 1, 2, 2      |
+| P3      | 9, 0, 2         | 3, 0, 2            | 6, 0, 0      |
+
+**Step-by-step Process**:
+1. P1 requests (0, 2, 0).
+   - **Available**: `A = 3, B = 3, C = 2`.
+   - **Check if Need <= Available**: P1’s Need `(7, 4, 3)` is greater than the Available `(3, 3, 2)`. So, this request can't be fulfilled, and P1 will wait.
+
+2. P2 requests (1, 0, 0).
+   - **Check if Need <= Available**: P2’s Need `(1, 2, 2)` is less than Available `(3, 3, 2)`.
+   - After granting resources to P2:
+     - **Available** becomes `A = 2, B = 3, C = 2`.
+   - Now, check if the system is in a safe state. Since P2 can finish, resources can be released, and the system remains safe.
+
+Thus, Banker’s Algorithm ensures the system only enters safe states and avoids deadlocks.
+
+---
+
+### **Summary of Deadlock Handling Methods**:
+
+| Method                    | Description                                                                                   | Example                                                                                   |
+|---------------------------|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| **Deadlock Prevention**    | Modify system conditions to ensure deadlock never occurs.                                      | Prevent circular wait by enforcing a strict resource request order.                       |
+| **Deadlock Avoidance**     | Dynamically avoid unsafe states using algorithms like Banker’s Algorithm.                      | Allocate resources to processes only if it results in a safe state.                       |
+| **Deadlock Detection**     | Allow deadlocks to occur, but detect and recover from them.                                    | Terminate processes involved in the deadlock.                                              |
+| **Deadlock Ignorance**     | Assume deadlocks are rare and do nothing to handle them.                                       | Many operating systems like Linux and Windows.                                             |
+
+### **Key Takeaway**:
+Deadlock handling is crucial in systems where multiple processes interact with shared resources. Techniques like **prevention**, **avoidance**, and **detection** help maintain system stability and ensure efficient resource allocation.
