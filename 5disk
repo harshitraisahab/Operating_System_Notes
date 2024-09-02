@@ -1,0 +1,188 @@
+### **Disk Architecture and Components:**
+
+A **hard disk** consists of several mechanical and electronic components that work together to store and retrieve data. The major components are:
+
+1. **Platters**: Circular disks coated with magnetic material. Data is stored on these platters in the form of tiny magnetic regions. Hard drives often have multiple platters stacked on top of one another.
+2. **Spindle**: A motor-driven shaft that rotates the platters at a constant speed, typically measured in revolutions per minute (RPM).
+
+3. **Read/Write Heads**: The heads are responsible for reading from and writing data to the platters. Each platter has two surfaces, and there’s a read/write head for each surface.
+
+4. **Arm Assembly (Actuator)**: The arms hold the read/write heads and move them radially across the platters. This movement allows the heads to access different tracks on the platters.
+
+5. **Tracks**: Concentric circles on the surface of the platter where data is recorded.
+
+6. **Sectors**: Each track is divided into smaller sections called sectors, which are the smallest unit of storage on the disk.
+
+7. **Cylinders**: A cylinder is a set of tracks located at the same distance from the center across all platters.
+
+8. **Controller**: The controller is the electronic component that manages the operation of the disk drive, including reading and writing data, as well as controlling the actuator.
+
+---
+
+### **Disk Access Time:**
+
+When a disk needs to read or write data, it must position the read/write head to the correct location on the disk. **Disk access time** is made up of the following components:
+
+1. **Seek Time**: The time required for the disk arm to move the read/write head to the desired track. Seek time is typically the largest contributor to disk access time.
+
+   - **Example**: If the disk arm has to move from track 3 to track 10, it will take time proportional to the distance between these tracks.
+
+2. **Rotational Latency**: Once the head is positioned over the correct track, it has to wait for the desired sector to rotate under the read/write head. This depends on the disk’s rotation speed.
+
+   - **Example**: If the disk is spinning at 7200 RPM, rotational latency will be around 4.16 milliseconds on average.
+
+3. **Transfer Time**: The time it takes to actually read or write the data after the head is positioned over the correct sector. This depends on the size of the data and the speed of the interface (e.g., SATA, NVMe).
+
+#### **Formula for Access Time**:
+
+```
+Disk Access Time = Seek Time + Rotational Latency + Transfer Time
+```
+
+---
+
+### **Disk Scheduling Algorithms:**
+
+The **disk scheduling algorithm** determines the order in which requests to read/write from the disk are serviced. The goal is to reduce the seek time and improve overall disk performance.
+
+---
+
+#### **1. First-Come, First-Served (FCFS):**
+
+In **FCFS**, requests are handled in the order in which they arrive, regardless of their position on the disk.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- The arm starts at track **100**.
+- The head would move as follows: **100 → 98 → 183 → 37 → 122 → 14 → 124**.
+
+#### **Advantages**:
+
+1. **Fair and Simple**: Easy to implement.
+2. **No Starvation**: Every request gets processed in the order it arrives.
+
+#### **Disadvantages**:
+
+1. **Inefficient**: Results in a lot of unnecessary seek time, as the arm may need to move back and forth across the disk frequently.
+
+---
+
+#### **2. Shortest Seek Time First (SSTF):**
+
+**SSTF** selects the request that requires the least movement of the disk arm (i.e., the shortest seek time) from the current head position.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- Head starts at **100**.
+- SSTF moves the head as follows: **100 → 98 → 122 → 124 → 183 → 37 → 14** (choosing the closest track each time).
+
+#### **Advantages**:
+
+1. **Less Seek Time**: Reduces the total seek time compared to FCFS.
+
+#### **Disadvantages**:
+
+1. **Starvation**: Some requests, especially those far from the current head position, might starve if there are always closer requests to service.
+
+---
+
+#### **3. SCAN (Elevator Algorithm)**:
+
+In **SCAN**, the head continuously moves toward one end of the disk, servicing all requests along the way, then reverses direction and services requests on the way back. It works like an elevator going up and down.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- Head starts at **100**, moving towards **0**.
+- SCAN moves as follows: **100 → 98 → 37 → 14 → 0 → 122 → 124 → 183**.
+
+#### **Advantages**:
+
+1. **Less Starvation**: Requests are processed in both directions, so far requests don’t wait indefinitely.
+2. **Less Seek Time**: More efficient than FCFS and SSTF as it avoids unnecessary back-and-forth movement.
+
+#### **Disadvantages**:
+
+1. **Unfair to Edge Requests**: Requests near the ends (0 or max) may have to wait longer.
+
+---
+
+#### **4. LOOK**:
+
+**LOOK** is similar to SCAN, but instead of going all the way to the end of the disk, the head reverses direction when there are no more requests in the current direction.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- Head starts at **100**.
+- LOOK moves as follows: **100 → 98 → 37 → 14 → 122 → 124 → 183** (head stops and reverses when there are no more requests in a direction).
+
+#### **Advantages**:
+
+1. **Better Performance than SCAN**: Reduces unnecessary movement by stopping at the last request in each direction.
+2. **Efficient Seek Time**: Seeks time is reduced compared to SCAN.
+
+#### **Disadvantages**:
+
+1. **Edge Starvation**: Requests at the extremes of the disk may still wait longer than others.
+
+---
+
+#### **5. Circular SCAN (C-SCAN)**:
+
+**C-SCAN** moves the head in one direction only. When it reaches the end, it quickly returns to the start without servicing any requests on the way back.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- Head starts at **100**.
+- C-SCAN moves as follows: **100 → 122 → 124 → 183 → (quick return to 0) → 14 → 37 → 98**.
+
+#### **Advantages**:
+
+1. **Uniform Wait Time**: All requests get a more uniform wait time, since the head always moves in one direction.
+2. **Fairness**: No direction is favored over the other.
+
+#### **Disadvantages**:
+
+1. **More Travel**: The head has to travel more, as it always moves from one end to the other and does not service requests on the return trip.
+
+---
+
+#### **6. Circular LOOK (C-LOOK)**:
+
+**C-LOOK** is like C-SCAN, but instead of going all the way to the end, it only goes as far as the last request in one direction, then quickly returns to the start.
+
+#### **Example**:
+
+- Requests: 98, 183, 37, 122, 14, 124
+- Head starts at **100**.
+- C-LOOK moves as follows: **100 → 122 → 124 → 183 → (quick return to lowest request) → 14 → 37 → 98**.
+
+#### **Advantages**:
+
+1. **Efficient Travel**: Reduces unnecessary movement by only traveling as far as the last request in one direction.
+2. **Fair to All Requests**: More uniform wait times.
+
+#### **Disadvantages**:
+
+1. **Complexity**: Slightly more complex to implement than SCAN or LOOK.
+
+---
+
+### **Comparison and Use Cases**:
+
+| **Algorithm** | **Advantages**                             | **Disadvantages**                             | **Use Cases**                                             |
+| ------------- | ------------------------------------------ | --------------------------------------------- | --------------------------------------------------------- |
+| **FCFS**      | Simple and fair                            | Inefficient, leads to long seek times         | Systems where fairness is more important than speed       |
+| **SSTF**      | Reduces seek time                          | Can cause starvation                          | Systems where reducing seek time is critical              |
+| **SCAN**      | Less starvation, more efficient than SSTF  | Unfair to edge requests                       | Suitable for general-purpose disk scheduling              |
+| **LOOK**      | Reduces unnecessary movement               | Still some edge starvation                    | Systems where efficiency is needed, without excess travel |
+| **C-SCAN**    | Fairer to all requests, uniform wait times | More travel, as it ignores requests on return | Large systems with heavy, diverse workloads               |
+| **C-LOOK**    | Efficient, uniform wait times              | Complex to implement                          | High-demand disk access systems                           |
+
+Each algorithm has its own strengths and weaknesses, and the choice of disk scheduling algorithm depends on the specific workload and performance requirements of the system
+
+.
