@@ -1,0 +1,153 @@
+### **Overlay:**
+**Overlay** is a memory management technique that allows programs larger than physical memory to run by dividing them into smaller, logical parts (called overlays). These parts are loaded into memory when needed, replacing sections that are no longer required. The program manages which parts of the code are needed at specific points and loads them accordingly.
+
+#### **Example:**
+Suppose a program has three modules: **A**, **B**, and **C**, but the total size exceeds available memory. Overlay would allow:
+- Load **A** and **B** in memory.
+- When **C** is needed, unload **B** and load **C** into the memory space formerly used by **B**.
+This way, only essential parts are in memory at any time, allowing larger programs to run in limited physical memory.
+
+---
+
+### **Virtual Memory:**
+**Virtual memory** is a technique that extends the computer’s physical memory by using a portion of the disk as if it were additional RAM. The OS swaps data between physical memory (RAM) and a designated space on the hard drive, called the **swap space** or **page file**, when the system needs more memory than is physically available.
+
+#### **How it Works:**
+- The OS divides programs into **pages** and keeps only the currently needed pages in RAM.
+- Pages that are not immediately needed are stored on the disk.
+- When a needed page is not in RAM, a **page fault** occurs, and the OS loads the page from disk into RAM, possibly swapping out another page.
+
+#### **Advantages:**
+1. **Runs Larger Programs:** Virtual memory enables systems to run programs that exceed the size of physical memory.
+2. **Efficient Use of Memory:** Only active pages need to be in RAM, maximizing available memory.
+
+#### **Disadvantages:**
+1. **Slow Access:** Accessing data from disk is much slower than accessing RAM.
+2. **Thrashing:** If the system swaps pages between RAM and disk too frequently, it can lead to reduced performance.
+
+---
+
+### **Page Replacement:**
+When a page is needed in memory but all frames are occupied, the OS must decide which page to swap out from RAM to make space. This decision is made using **page replacement algorithms**.
+
+---
+
+### **Page Replacement Algorithms:**
+
+#### **1. First-In-First-Out (FIFO) Page Replacement:**
+- In **FIFO**, the oldest page (the one that entered memory first) is replaced when a new page is loaded.
+
+#### **Example:**
+Assume the system has 3 page frames and the page reference string is: **1, 2, 3, 4**.
+- Pages **1**, **2**, and **3** are loaded into memory.
+- When page **4** is requested, page **1** (the oldest) is replaced with page **4**.
+
+#### **Advantages:**
+1. **Simple to Implement.**
+2. **Easy to Understand.**
+
+#### **Disadvantages:**
+1. **Poor Performance:** May replace frequently used pages, leading to frequent page faults.
+
+---
+
+#### **2. Optimal Page Replacement:**
+- **Optimal Page Replacement** replaces the page that will not be used for the longest period in the future. This algorithm results in the fewest page faults but is not implementable in real-time systems because it requires knowledge of future requests.
+
+#### **Example:**
+If the page reference string is **7, 0, 1, 2, 0, 3, 0, 4**, and the system has 3 frames:
+- After loading **7**, **0**, and **1**, when **2** is requested, the optimal choice is to replace **7** (since **7** will not be used for the longest time).
+
+#### **Advantages:**
+1. **Fewest Page Faults:** Provides the optimal solution for page replacement.
+
+#### **Disadvantages:**
+1. **Not Realistic:** Requires knowledge of future page references, making it impractical in most real-world applications.
+
+---
+
+#### **3. Least Recently Used (LRU) Page Replacement:**
+- **LRU** replaces the page that has not been used for the longest time.
+
+#### **Example:**
+For the page reference string **1, 2, 3, 1, 4**, and with 3 frames:
+- Initially, pages **1**, **2**, and **3** are loaded.
+- When page **4** is requested, page **2** (the least recently used) is replaced.
+
+#### **Advantages:**
+1. **Good Performance:** Frequently used pages are less likely to be replaced.
+2. **Widely Used:** LRU is practical and performs well.
+
+#### **Disadvantages:**
+1. **Requires Tracking:** Needs hardware or software to track page usage, which can be complex.
+
+---
+
+#### **4. Most Recently Used (MRU) Page Replacement:**
+- **MRU** replaces the page that was most recently used. It works under the assumption that the most recently used page may not be needed in the immediate future.
+
+#### **Example:**
+In the page reference string **1, 2, 3, 4, 2**, and with 3 frames:
+- Pages **1**, **2**, and **3** are loaded.
+- When page **4** is requested, the **most recently used** page, **3**, is replaced.
+
+#### **Advantages:**
+1. **Performs Well in Specific Scenarios:** Effective when programs exhibit specific memory access patterns.
+
+#### **Disadvantages:**
+1. **Inconsistent Performance:** Can lead to poor performance in common scenarios where frequently used pages are constantly replaced.
+
+---
+
+### **Translation Lookaside Buffer (TLB):**
+A **Translation Lookaside Buffer (TLB)** is a cache used to speed up the translation of virtual addresses to physical addresses. Instead of looking up the page table every time a memory access is made, the TLB stores recent translations of virtual-to-physical addresses. 
+
+#### **How It Works:**
+1. When the CPU generates a virtual address, the TLB is checked first to see if the translation (from page to frame) is already cached.
+2. If the translation is found in the TLB (a **TLB hit**), it’s used to quickly get the physical address.
+3. If the translation isn’t found (a **TLB miss**), the OS must check the page table to get the physical address, and this translation is stored in the TLB for future use.
+
+#### **Example:**
+Assume a program frequently accesses memory locations mapped to pages **2, 3, and 5**. The TLB stores the mappings:
+- Page **2** → Frame **10**
+- Page **3** → Frame **7**
+- Page **5** → Frame **2**
+If the program accesses page **2** again, the TLB can quickly return frame **10**, bypassing the page table lookup.
+
+#### **Advantages:**
+1. **Faster Memory Access:** Reduces the time needed to translate addresses.
+2. **Improves Performance:** Especially effective for processes with frequent memory access to the same locations.
+
+#### **Disadvantages:**
+1. **Limited Size:** The TLB can store only a limited number of entries, so not all page translations may be cached.
+
+---
+
+### **Putting It All Together:**
+1. **Virtual Memory** allows systems to run larger programs by using disk space as an extension of physical memory, and it relies on **paging** to divide processes into pages.
+2. When physical memory is full, **page replacement** algorithms like **FIFO**, **LRU**, and **Optimal** determine which page to swap out.
+3. The **TLB** speeds up the translation of virtual addresses to physical addresses by caching recent address translations.
+
+By using these techniques, the operating system efficiently manages memory, allowing larger and more complex applications to run on systems with limited physical memory.
+
+
+Windows primarily uses a variation of the **Least Recently Used (LRU)** page replacement algorithm, but with enhancements to improve efficiency, such as the **Clock algorithm** or **Second-Chance algorithm**.
+
+### **How it works in Windows:**
+
+1. **Modified LRU:**
+   - Windows uses a modified version of **LRU** where pages are ranked based on their recent usage. However, instead of strictly removing the least recently used page, it gives each page a second chance before replacing it.
+
+2. **Clock Algorithm (Second-Chance):**
+   - Windows often employs a variant of the **Clock algorithm** to approximate LRU. The system maintains a circular list of pages, and a pointer (acting as the "hand of a clock") moves through the pages. 
+   - When a page is selected for replacement, the OS checks a reference bit associated with each page:
+     - If the reference bit is **0**, the page is replaced.
+     - If the reference bit is **1**, the page is given a "second chance" (the bit is reset to 0), and the algorithm moves to the next page.
+
+3. **Windows Working Set Model:**
+   - Windows also uses the **Working Set model**, where each process has a **working set** — the set of pages that the process currently needs.
+   - If a process tries to access a page outside its working set, a page fault occurs, and a page must be brought into memory, potentially replacing another page from the process’s working set based on the modified LRU algorithm.
+
+#### **Summary:**
+- Windows uses a **modified LRU** algorithm with optimizations like the **Clock algorithm** to improve performance.
+- These approaches balance memory usage efficiently while minimizing page faults and ensuring critical pages stay in memory for processes that need them.
